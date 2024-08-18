@@ -1,9 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Container from "../commen/Container";
 import Row from "../commen/Row";
 import { Link } from "react-router-dom/cjs/react-router-dom.min";
+import apiEndpoints from "../../apis/endpoint";
+import client from "../../apis";
 
 function PoularProducts() {
+  const [products, setProducts] = useState([]);
+
+  const getData = async () => {
+    try {
+      const response = await client.get(apiEndpoints.products());
+      setProducts(response.data.docs);
+    } catch (error) {
+      console.log("ERROR", error);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
   return (
     <Container>
       <Row className="justify-center my-[20px] uppercase">
@@ -17,19 +33,23 @@ function PoularProducts() {
             Explore new and popular styles
           </p>
         </div>
-        <Link to="/product-detail">
+        <Link to={`/product/${products[0]?._id}`}>
           <img
             className="w-[648px] h-[648px] object-cover cursor-pointer"
-            src="https://files.cdn.printful.com/o/upload/bfl-image/28/10325_l_statement%20eco.jpg"
+            src={products[0]?.img}
             alt="top popular"
           />
         </Link>
         <Row className="w-1/2 flex-wrap gap-[24px]">
-          {[...Array(4)].map((_, idx) => (
-            <Link to="/product-detail" className=" w-[46%] h-[312px]" key={idx}>
+          {products.slice(1).map((item, idx) => (
+            <Link
+              to={`/product/${item._id}`}
+              className=" w-[46%] h-[312px]"
+              key={item._id}
+            >
               <img
-                src="https://images.unsplash.com/photo-1603808033192-082d6919d3e1?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fHNob2V8ZW58MHx8MHx8fDA%3D"
-                alt="product"
+                src={item.img}
+                alt={item.title}
                 className="w-[312px] h-full object-cover"
               />
             </Link>
